@@ -31,7 +31,7 @@ Para dar início à análise exploratória, é essencial se familiarizar com o c
 <p align='center'><img src="Imagens/Explorar_1.png" width="50%"></p>
 
 ## Explorando dados
-Verificando dimensões do dataframe:
+Verificando dimensões do dataframe: A base de dados possui 60428 observações (linhas) e 40 variáveis (colunas)
 ```python
 df.shape
 Out[3]: (60428, 40)
