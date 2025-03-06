@@ -1,6 +1,6 @@
 # Análise Exploratória de Dados (EDA): Caso Convenient Food Mart (CFM)
 
-<img src="imagens/eda_cfm.png" alt="EDA CFM" width="50%">
+<img src="Imagens/eda_cfm.png" alt="EDA CFM" width="50%">
 
 ## Objetivo  
 Preparar um relatório para o Grupo Convenient Food Mart (CFM) com uma análise inicial da base de dados de suas promoções. O objetivo é avaliar a qualidade dos dados coletados, identificar possíveis erros e encontrar padrões e relações entre variáveis que possam influenciar o custo de aquisição de clientes e o desempenho das promoções.
