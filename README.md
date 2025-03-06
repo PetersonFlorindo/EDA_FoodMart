@@ -22,4 +22,19 @@ O Grupo Convenient Food Mart (CFM) levantou questões estratégicas para entende
 3. As características e a estrutura da loja afetam o desempenho das promoções?  
 4. O tipo de mídia e promoção utilizada afetam a eficiência das vendas promocionais?  
 5. O custo de aquisição de clientes são é por quais fatores?  
-6. Quais variáveis combinadas afetam as vendas promocionais?  
+6. Quais variáveis combinadas afetam as vendas promocionais?
+
+---
+
+## Iniciando projeto e explorando dados
+Para dar início à análise exploratória, é essencial se familiarizar com o conjunto de dados presente no dataset estudado. Uma ferramenta útil para obter uma visão geral dos dataframes antes de analisá-los é o IDE Spyder, utilizado neste projeto. Ele permite visualizar os dataframes diretamente no ambiente de desenvolvimento assim que são salvos como objetos, facilitando a inspeção inicial dos dados.
+<p align='center'><img src="Imagens/Explorar_1.png" width="50%"></p>
+
+
+
+
+
+
+
+
+
