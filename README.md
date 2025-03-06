@@ -53,7 +53,24 @@ Index(['food_category', 'food_department', 'food_family',
        'prepared_food', 'florist', 'media_type', 'cost'],
       dtype='object')
 ```
+Nota-se que a coluna 'avg_cars_at home (approx)' está duplicada. Será necessário removê-la:
+```python
+df = df.drop(columns='avg_cars_at home(approx).1')
 
-
+df.columns
+Out[6]: 
+Index(['food_category', 'food_department', 'food_family',
+       'store_sales(in millions)', 'store_cost(in millions)',
+       'unit_sales(in millions)', 'promotion_name', 'sales_country',
+       'marital_status', 'gender', 'total_children', 'education',
+       'member_card', 'occupation', 'houseowner', 'avg_cars_at home(approx)',
+       'avg. yearly_income', 'num_children_at_home', 'brand_name', 'SRP',
+       'gross_weight', 'net_weight', 'recyclable_package', 'low_fat',
+       'units_per_case', 'store_type', 'store_city', 'store_state',
+       'store_sqft', 'grocery_sqft', 'frozen_sqft', 'meat_sqft', 'coffee_bar',
+       'video_store', 'salad_bar', 'prepared_food', 'florist', 'media_type',
+       'cost'],
+      dtype='object')
+```
 
 
