@@ -214,29 +214,4 @@ plt.title('Matriz de correlação')
 plt.show()
 
 #analise quanti x quali
-
-for variavel_quant in colunas_quant:
-    for variavel_quali in colunas_quali:
- # Calcula a média da variável quantitativa por categoria qualitativa
-        stats = df.groupby(variavel_quali)[variavel_quant].mean()
-
-        # Obtém o maior e o menor valor médio da categoria
-        max_val = stats.max()
-        min_val = stats.min()
-
-        # Calcula a diferença percentual
-        diff_percent = (max_val - min_val) / max_val
-
-        # Se a diferença for maior que 10%, gera o gráfico
-        if diff_percent > 0.10:
-            plt.figure(figsize=(20,10))
-
-            # Ordenação decrescente
-            ordem = stats.sort_values(ascending=False).index
-
-            sns.barplot(x=df[variavel_quali], y=df[variavel_quant], data=df, order=ordem)
-
-            plt.xticks(rotation=90)
-            plt.title(f'{variavel_quant} por {variavel_quali} (Diferença: {diff_percent:.1%})')
-            plt.show()
         
