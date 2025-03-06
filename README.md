@@ -36,9 +36,23 @@ Para dar início à análise exploratória, é essencial se familiarizar com o c
 df.shape
 Out[3]: (60428, 40)
 ```
-
-
-
+2. Identificando variáveis do dataframe:
+```python
+df.columns
+Out[4]: 
+Index(['food_category', 'food_department', 'food_family',
+       'store_sales(in millions)', 'store_cost(in millions)',
+       'unit_sales(in millions)', 'promotion_name', 'sales_country',
+       'marital_status', 'gender', 'total_children', 'education',
+       'member_card', 'occupation', 'houseowner', 'avg_cars_at home(approx)',
+       'avg. yearly_income', 'num_children_at_home',
+       'avg_cars_at home(approx).1', 'brand_name', 'SRP', 'gross_weight',
+       'net_weight', 'recyclable_package', 'low_fat', 'units_per_case',
+       'store_type', 'store_city', 'store_state', 'store_sqft', 'grocery_sqft',
+       'frozen_sqft', 'meat_sqft', 'coffee_bar', 'video_store', 'salad_bar',
+       'prepared_food', 'florist', 'media_type', 'cost'],
+      dtype='object')
+```
 
 
 
