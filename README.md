@@ -17,7 +17,7 @@ Como tarefa, preciso identificar possíveis padrões e relações entre variáve
 ## Perguntas de negócio  
 O Grupo Convenient Food Mart (CFM) levantou questões estratégicas para entender os fatores que influenciam o desempenho das promoções e o custo de aquisição de clientes. Essas perguntas foram formuladas com base na revisão de dados históricos, discussões com as equipes de marketing e operações e análise de tendências do mercado:
 
-1. O desempenho das campanhas de promoções está associado ao tipo de produto em promoção ou ao tipo de loja em que a promoção ocorre? 
+1. O desempenho das campanhas está associado ao tipo de produto em promoção ou ao tipo de loja em que a promoção ocorre? 
 2. O perfil do cliente influencia a participação e o volume de compras promocionais?  
 3. As características e a estrutura da loja afetam o desempenho das promoções?  
 4. O tipo de mídia e promoção utilizada afetam a eficiência das vendas promocionais?  
