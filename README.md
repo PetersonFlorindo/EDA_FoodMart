@@ -222,3 +222,5 @@ media_type                    13
 cost                         328
 dtype: int64
 ```
+##Resultados e discussão
+Observa-se que não há dados faltantes ou duplicados, o que indica que essa base já passou por um processamento prévio para facilitar a extração de informações. No entanto, apesar de estar aparentemente limpa, foi identificada e removida uma coluna duplicada, reduzindo o número de variáveis de 40 para 39. Com as variáveis qualitativas e quantitativas definidas, podemos agora iniciar sua análise.
