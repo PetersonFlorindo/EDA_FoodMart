@@ -226,3 +226,149 @@ dtype: int64
 ## Resultados e discussão
 
 Observa-se que não há dados faltantes ou duplicados, o que indica que essa base já passou por um processamento prévio para facilitar a extração de informações. No entanto, apesar de estar aparentemente limpa, foi identificada e removida uma coluna duplicada, reduzindo o número de variáveis de 40 para 39. Com as variáveis qualitativas e quantitativas definidas, podemos agora iniciar sua análise.
+
+---
+
+## Análise Exploratória das Variáveis
+
+Na análise univariada, exploraremos cada variável individualmente para entender sua distribuição, tendência central e dispersão. Já na análise multivariada, investigaremos as relações entre diferentes variáveis, buscando identificar padrões, correlações e possíveis insights que possam impactar as promoções e o custo de aquisição de clientes.
+
+# Análise Univariada: Variáveis qualitativas
+
+1. Criando um dataframe com as variáveis qualitativas:
+```Python
+#Variáveis qualitativas
+colunas_quali = df.select_dtypes(include=['object']).columns
+
+#Criando dataframe apenas com variáveis qualitativas
+df_quali = df.select_dtypes(include=['object'])
+```
+2. Explorando categorias dentro das variáveis:
+```Python
+
+for i in colunas_quali:
+    print(f'\n Variável: {i} \n Valores únicos: {df[i].unique()}')
+
+ Variável: food_category 
+ Valores únicos: ['Breakfast Foods' 'Bread' 'Canned Shrimp' 'Baking Goods' 'Vegetables'
+ 'Frozen Desserts' 'Candy' 'Snack Foods' 'Dairy' 'Starchy Foods'
+ 'Cleaning Supplies' 'Decongestants' 'Meat' 'Hot Beverages'
+ 'Jams and Jellies' 'Carbonated Beverages' 'Seafood' 'Specialty'
+ 'Kitchen Products' 'Electrical' 'Beer and Wine' 'Candles' 'Fruit'
+ 'Pure Juice Beverages' 'Canned Soup' 'Paper Products' 'Canned Tuna'
+ 'Eggs' 'Hardware' 'Canned Sardines' 'Canned Clams' 'Pain Relievers'
+ 'Side Dishes' 'Bathroom Products' 'Magazines' 'Frozen Entrees' 'Pizza'
+ 'Cold Remedies' 'Canned Anchovies' 'Drinks' 'Hygiene' 'Plastic Products'
+ 'Canned Oysters' 'Packaged Vegetables' 'Miscellaneous']
+
+ Variável: food_department 
+ Valores únicos: ['Frozen Foods' 'Baked Goods' 'Canned Foods' 'Baking Goods' 'Produce'
+ 'Snacks' 'Snack Foods' 'Dairy' 'Starchy Foods' 'Household'
+ 'Health and Hygiene' 'Meat' 'Beverages' 'Seafood' 'Deli'
+ 'Alcoholic Beverages' 'Canned Products' 'Eggs' 'Periodicals'
+ 'Breakfast Foods' 'Checkout' 'Carousel']
+
+ Variável: food_family 
+ Valores únicos: ['Food' 'Non-Consumable' 'Drink']
+
+ Variável: promotion_name 
+ Valores únicos: ['Bag Stuffers' 'Cash Register Lottery' 'High Roller Savings'
+ 'Double Down Sale' 'Green Light Days' 'Big Time Savings' 'Price Savers'
+ 'Price Slashers' 'Dollar Days' 'Two Day Sale' 'Super Duper Savers'
+ 'Weekend Markdown' 'Dollar Cutters' 'Sales Galore' 'Big Promo'
+ 'Free For All' 'Savings Galore' 'Unbeatable Price Savers'
+ 'Price Smashers' 'Shelf Clearing Days' 'Sales Days' 'Go For It'
+ 'Super Savers' 'Wallet Savers' 'Save-It Sale' 'Price Destroyers'
+ 'Two for One' 'Big Time Discounts' 'Shelf Emptiers' 'Bye Bye Baby'
+ 'One Day Sale' 'Fantastic Discounts' 'Saving Days' 'You Save Days'
+ 'Sale Winners' 'Coupon Spectacular' 'Three for One' 'Price Winners'
+ 'Dimes Off' 'I Cant Believe It Sale' 'Money Savers' 'Green Light Special'
+ 'Price Cutters' 'Tip Top Savings' 'Best Savings' 'Pick Your Savings'
+ 'Double Your Savings' 'Mystery Sale' 'Super Wallet Savers']
+
+ Variável: sales_country 
+ Valores únicos: ['USA' 'Mexico' 'Canada']
+
+ Variável: marital_status 
+ Valores únicos: ['M' 'S']
+
+ Variável: gender 
+ Valores únicos: ['F' 'M']
+
+ Variável: education 
+ Valores únicos: ['Partial High School' 'Bachelors Degree' 'High School Degree'
+ 'Graduate Degree' 'Partial College']
+
+ Variável: member_card 
+ Valores únicos: ['Normal' 'Silver' 'Bronze' 'Golden']
+
+ Variável: occupation 
+ Valores únicos: ['Skilled Manual' 'Professional' 'Manual' 'Management' 'Clerical']
+
+ Variável: houseowner 
+ Valores únicos: ['Y' 'N']
+
+ Variável: avg. yearly_income 
+ Valores únicos: ['$10K - $30K' '$50K - $70K' '$30K - $50K' '$70K - $90K' '$110K - $130K'
+ '$130K - $150K' '$150K +' '$90K - $110K']
+
+ Variável: brand_name 
+ Valores únicos: ['Carrington' 'Golden' 'Imagine' 'Big Time' 'PigTail' 'Fantastic' 'Great'
+ 'Sphinx' 'Modell' 'Colony' 'Blue Label' 'Pleasant' 'Bravo' 'Better'
+ 'Just Right' 'Plato' 'BBB Best' 'Landslide' 'Super' 'CDR' 'High Top'
+ 'Tri-State' 'Hermanos' 'Tell Tale' 'Ebony' 'Thresher' 'Gulf Coast'
+ 'Musial' 'Atomic' 'Choice' 'Fort West' 'Nationeel' 'Horatio'
+ 'Best Choice' 'Fast' 'Gorilla' 'Carlson' 'Even Better' 'Club' 'Booker'
+ 'Shady Lake' 'Monarch' 'Discover' 'Colossal' 'Medalist' 'Jardon'
+ 'Cormorant' 'Sunset' 'Red Wing' 'High Quality' 'Denny' 'Faux Products'
+ 'Steady' 'Consolidated' 'Bird Call' 'Hilltop' 'Ship Shape' 'Footnote'
+ 'Genteel' 'Quick' 'Gerolli' 'Excellent' 'Fabulous' 'Token' 'Skinner'
+ 'Washington' 'Dual City' 'Kiwi' 'Tip Top' 'Amigo' 'Curlew' 'Moms'
+ 'Cutting Edge' 'Red Spade' 'Lake' 'American' 'Walrus' 'Pearl' 'Good'
+ 'Top Measure' 'Portsmouth' 'Toucan' 'Applause' 'Swell' 'Green Ribbon'
+ 'Big City' 'National' 'Blue Medal' 'Urban' 'Jumbo' 'Giant' 'Dollar'
+ 'Mighty Good' 'Robust' 'Gauss' 'Excel' 'Radius' 'Best' 'Jeffers'
+ 'Johnson' 'Special' 'Akron' 'Framton' 'Black Tie' 'Queen' 'James Bay'
+ 'Toretti' 'Prelude' 'Symphony' 'ADJ' 'King']
+
+ Variável: store_type 
+ Valores únicos: ['Deluxe Supermarket' 'Supermarket' 'Gourmet Supermarket' 'Small Grocery'
+ 'Mid-Size Grocery']
+
+ Variável: store_city 
+ Valores únicos: ['Salem' 'Tacoma' 'Seattle' 'Spokane' 'Los Angeles' 'Beverly Hills'
+ 'Portland' 'Bellingham' 'Orizaba' 'Merida' 'Hidalgo' 'Mexico City'
+ 'Vancouver' 'Bremerton' 'Camacho' 'Guadalajara' 'Acapulco'
+ 'San Francisco' 'Victoria']
+
+ Variável: store_state 
+ Valores únicos: ['OR' 'WA' 'CA' 'Veracruz' 'Yucatan' 'Zacatecas' 'DF' 'BC' 'Jalisco'
+ 'Guerrero']
+
+ Variável: media_type 
+ Valores únicos: ['Daily Paper, Radio' 'In-Store Coupon' 'Radio' 'Daily Paper'
+ 'Product Attachment' 'Sunday Paper, Radio' 'Sunday Paper, Radio, TV'
+ 'Sunday Paper' 'Street Handout' 'TV' 'Bulk Mail' 'Cash Register Handout'
+ 'Daily Paper, Radio, TV']
+```
+3. Explorando distribuição e frequência das categorias dentro das variáveis:
+```Python
+#Análise das variáveis qualitativas: Frequência absoluta
+for variavel in df_quali:
+    #ordena variáveis em ordem decrescente
+    ordem = df_quali[variavel].value_counts().index
+    plt.Figure(figsize=(20,10))
+    sns.countplot(x=df_quali[variavel], order=ordem)
+    plt.title(f'Frequência Absoluta - {variavel}')
+    plt.xlabel(xlabel=f'{variavel}')
+    plt.ylabel('Frequência')
+    plt.xticks(rotation=90)
+    plt.tight_layout()
+    plt.show()    
+```
+4. Explorando distribuições de interesse:
+```Python
+
+```
+
+5. 
