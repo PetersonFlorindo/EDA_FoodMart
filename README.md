@@ -386,9 +386,30 @@ A distribuição das categorias nas variáveis qualitativas revelou as seguintes
 <img src="Imagens/Quali_geral_1 (16).png" width="25%">
 <img src="Imagens/Quali_geral_1 (17).png" width="25%">
 </p>
-4. Explorando distribuições de interesse:
-```Python
 
-```
+## Resultados e discussão
 
-5. 
+1. Categorias de alimento mais vendidas em promoção
+<p align='center'> <img src="Imagens/Quali_uni_especifico (5).png" width="40%"></p>
+       
+As categorias Vegetables, Snack Foods e Dairy lideram as vendas promocionais, representando juntas mais de 30% do total. Isso sugere que itens básicos e de alto consumo diário respondem melhor a campanhas promocionais. Em contrapartida, categorias como Packaged Staples e Canned Sardines apresentam baixa adesão às promoções, indicando menor impacto dos descontos nesses segmentos.
+
+2. Distribuição das vendas em promoção por tipo de cliente
+<p align='center'> <img src="Imagens/Quali_uni_especifico (3).png" width="40%"></p>
+
+Clientes com cartão Bronze são os que mais compram produtos promocionais, representando 55,95% das vendas nessa categoria. Esse dado sugere que clientes com menor fidelidade ao programa de benefícios podem ser mais sensíveis a descontos. Já clientes Golden e Silver, que teoricamente têm maior engajamento, participam menos das promoções, o que pode indicar que suas compras não dependem tanto de incentivos promocionais.
+
+3. Distribuição das vendas em promoção por escolaridade do cliente
+<p align='center'> <img src="Imagens/Quali_uni_especifico (2).png" width="40%"></p>
+
+A participação nas promoções é maior entre clientes com ensino médio completo ou incompleto, representando juntos cerca de 60% das vendas promocionais. Já clientes com ensino superior completo (Graduate Degree) apresentam a menor adesão às promoções (5,15%), sugerindo que esse grupo pode ser menos sensível a descontos diretos. Essa tendência pode indicar que promoções voltadas para clientes de maior escolaridade precisam de abordagens diferenciadas, como benefícios agregados ou programas de fidelidade.
+
+4. Distribuição das vendas em promoção por renda do cliente
+<p align='center'> <img src="Imagens/Quali_uni_especifico (1).png" width="40%"></p>
+
+Clientes com renda entre $30K e $50K são os mais propensos a comprar produtos em promoção, seguidos pelos que ganham entre $10K e $30K. Isso indica que consumidores de baixa e média renda têm maior sensibilidade a descontos. Já os clientes com renda acima de $90K apresentam baixa participação, sugerindo que estratégias promocionais para esse público podem precisar de abordagens diferentes, como exclusividade e benefícios não monetários.
+
+5. Distribuição das vendas em promoção por tipo de loja
+<p align='center'> <img src="Imagens/Quali_uni_especifico (4).png" width="40%"></p>
+
+A maior parte das vendas promocionais ocorre em supermercados tradicionais (43,34%) e deluxe supermarkets (37,99%), indicando que esses formatos de loja são os mais propensos a oferecer e impulsionar promoções. Já Gourmet Supermarkets possuem uma participação muito menor (10,76%), o que pode indicar que clientes desses estabelecimentos são menos sensíveis a descontos diretos. Pequenos mercados (Mid-Size Grocery e Small Grocery) representam uma fatia marginal das vendas promocionais, sugerindo que promoções nesses locais podem precisar de estratégias diferenciadas para aumentar a adesão.
