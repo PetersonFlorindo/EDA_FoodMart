@@ -366,6 +366,26 @@ for variavel in df_quali:
     plt.tight_layout()
     plt.show()    
 ```
+A distribuição das categorias nas variáveis qualitativas revelou as seguintes frequências:
+<p align='center'>
+<img src="Imagens/Quali_geral_1 (1).png" width="25%">
+<img src="Imagens/Quali_geral_1 (2).png" width="25%">
+<img src="Imagens/Quali_geral_1 (3).png" width="25%">
+<img src="Imagens/Quali_geral_1 (4).png" width="25%">
+<img src="Imagens/Quali_geral_1 (5).png" width="25%">
+<img src="Imagens/Quali_geral_1 (6).png" width="25%">
+<img src="Imagens/Quali_geral_1 (7).png" width="25%">
+<img src="Imagens/Quali_geral_1 (8).png" width="25%">
+<img src="Imagens/Quali_geral_1 (9).png" width="25%">
+<img src="Imagens/Quali_geral_1 (10).png" width="25%">
+<img src="Imagens/Quali_geral_1 (11).png" width="25%">
+<img src="Imagens/Quali_geral_1 (12).png" width="25%">
+<img src="Imagens/Quali_geral_1 (13).png" width="25%">
+<img src="Imagens/Quali_geral_1 (14).png" width="25%">
+<img src="Imagens/Quali_geral_1 (15).png" width="25%">
+<img src="Imagens/Quali_geral_1 (16).png" width="25%">
+<img src="Imagens/Quali_geral_1 (17).png" width="25%">
+</p>
 4. Explorando distribuições de interesse:
 ```Python
 
