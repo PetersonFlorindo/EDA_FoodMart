@@ -231,7 +231,7 @@ Observa-se que não há dados faltantes ou duplicados, o que indica que essa bas
 
 ## Análise Exploratória das Variáveis
 
-Na análise univariada, exploraremos cada variável individualmente para entender sua distribuição, tendência central e dispersão. Já na análise multivariada, investigaremos as relações entre diferentes variáveis, buscando identificar padrões, correlações e possíveis insights que possam impactar as promoções e o custo de aquisição de clientes.
+Na análise univariada, foi explorada cada variável individualmente para entender sua distribuição, tendência central e dispersão. Já na análise multivariada, foram investigadas as relações entre diferentes variáveis, buscando identificar padrões, correlações e possíveis insights que possam impactar as promoções e o custo de aquisição de clientes.
 
 # Análise Univariada: Variáveis qualitativas
 
@@ -388,6 +388,8 @@ A distribuição das categorias nas variáveis qualitativas revelou as seguintes
 </p>
 
 ## Resultados e discussão
+
+Após a avaliação inicial da distribuição das variáveis, algumas tendências chamaram atenção, especialmente em relação ao impacto das promoções em diferentes perfis de clientes, categorias de produtos e tipos de loja. Para entender melhor esses padrões, foram realizadas análises segmentadas, permitindo identificar quais grupos respondem melhor às estratégias promocionais e onde há oportunidades de otimização. A seguir, serão apresentados os principais insights extraídos dessas análises.
 
 1. Categorias de alimento mais vendidas em promoção
 <p align='center'> <img src="Imagens/Quali_uni_especifico (5).png" width="40%"></p>
