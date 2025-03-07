@@ -229,7 +229,7 @@ Observa-se que não há dados faltantes ou duplicados, o que indica que essa bas
 
 ---
 
-## Análise Exploratória das Variáveis
+# Análise Exploratória das Variáveis
 
 Na análise univariada, foi explorada cada variável individualmente para entender sua distribuição, tendência central e dispersão. Já na análise multivariada, foram investigadas as relações entre diferentes variáveis, buscando identificar padrões, correlações e possíveis insights que possam impactar as promoções e o custo de aquisição de clientes.
 
