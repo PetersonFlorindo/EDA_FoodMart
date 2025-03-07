@@ -458,3 +458,111 @@ df_quant = remove_outliers(df_quant)
 dados_colunas_quant = df.select_dtypes(exclude=['object']).describe().T
 ```
 <p align='center'> <img src="Imagens/Quanti_geral_explorar.png" width="40%"></p>
+
+4. Visualização da distribuição das variáveis quantitativas:
+```Python
+for variavel in df_quant:
+    plt.Figure(figsize=(20,10))
+    sns.displot(x=df_quant[variavel], kde= True)
+    plt.title(f'Distribuição de valores - {variavel}')
+    plt.xlabel(xlabel=f'{variavel}')
+    plt.ylabel('Contagem')
+    plt.xticks(rotation=90)
+    plt.tight_layout()
+    plt.show()
+    plt.boxplot(df_quant[variavel], vert=False)
+    plt.title(f'Boxplot - {variavel}')
+    plt.ylabel('Amostra')
+    plt.xlabel('Valor')
+    plt.show()
+```
+A distribuição das variáveis quantitativas revelou os seguintes padrões estatísticos: 
+<p align='center'>
+    <img src="Imagens/Quanti_Geral (2).png" width="10%">
+    <img src="Imagens/Quanti_Geral (1).png" width="10%">
+    <img src="Imagens/Quanti_Geral (4).png" width="10%">
+    <img src="Imagens/Quanti_Geral (3).png" width="10%">
+    <img src="Imagens/Quanti_Geral (6).png" width="10%">
+    <img src="Imagens/Quanti_Geral (5).png" width="10%">
+    <img src="Imagens/Quanti_Geral (8).png" width="10%">
+    <img src="Imagens/Quanti_Geral (7).png" width="10%">
+    <img src="Imagens/Quanti_Geral (10).png" width="10%">
+    <img src="Imagens/Quanti_Geral (9).png" width="10%">
+    <img src="Imagens/Quanti_Geral (12).png" width="10%">
+    <img src="Imagens/Quanti_Geral (11).png" width="10%">
+    <img src="Imagens/Quanti_Geral (14).png" width="10%">
+    <img src="Imagens/Quanti_Geral (13).png" width="10%">
+    <img src="Imagens/Quanti_Geral (16).png" width="10%">
+    <img src="Imagens/Quanti_Geral (15).png" width="10%">
+    <img src="Imagens/Quanti_Geral (18).png" width="10%">
+    <img src="Imagens/Quanti_Geral (17).png" width="10%">
+    <img src="Imagens/Quanti_Geral (20).png" width="10%">
+    <img src="Imagens/Quanti_Geral (19).png" width="10%">
+    <img src="Imagens/Quanti_Geral (22).png" width="10%">
+    <img src="Imagens/Quanti_Geral (21).png" width="10%">
+    <img src="Imagens/Quanti_Geral (24).png" width="10%">
+    <img src="Imagens/Quanti_Geral (23).png" width="10%">
+    <img src="Imagens/Quanti_Geral (26).png" width="10%">
+    <img src="Imagens/Quanti_Geral (25).png" width="10%">
+    <img src="Imagens/Quanti_Geral (28).png" width="10%">
+    <img src="Imagens/Quanti_Geral (27).png" width="10%">
+    <img src="Imagens/Quanti_Geral (30).png" width="10%">
+    <img src="Imagens/Quanti_Geral (29).png" width="10%">
+    <img src="Imagens/Quanti_Geral (32).png" width="10%">
+    <img src="Imagens/Quanti_Geral (31).png" width="10%">
+    <img src="Imagens/Quanti_Geral (34).png" width="10%">
+    <img src="Imagens/Quanti_Geral (33).png" width="10%">
+    <img src="Imagens/Quanti_Geral (36).png" width="10%">
+    <img src="Imagens/Quanti_Geral (35).png" width="10%">
+    <img src="Imagens/Quanti_Geral (38).png" width="10%">
+    <img src="Imagens/Quanti_Geral (37).png" width="10%">
+    <img src="Imagens/Quanti_Geral (40).png" width="10%">
+    <img src="Imagens/Quanti_Geral (39).png" width="10%">
+    <img src="Imagens/Quanti_Geral (42).png" width="10%">
+    <img src="Imagens/Quanti_Geral (41).png" width="10%">
+    <img src="Imagens/Quanti_Geral (44).png" width="10%">
+    <img src="Imagens/Quanti_Geral (43).png" width="10%">
+</p>
+
+Durante a análise exploratória, foram identificadas variáveis originalmente categóricas que haviam sido convertidas para valores binários (0 e 1), como low_fat, recyclable_package, coffee_bar, video_store, salad_bar, prepared_food e florist. Essa identificação foi possível por meio da distribuição dessas variáveis nos histogramas, que apresentaram dois picos bem definidos, característicos de dados binários. Embora a codificação numérica seja útil para determinadas modelagens estatísticas, foi realizada a reconversão dessas variáveis para sua forma original ("Sim"/"Não"). Essa reformulação permitirá uma análise complementar focada na relação dessas variáveis qualitativas com outros fatores, como desempenho das promoções.
+
+5. Explorando variáveis qualitativas adicionais:
+
+Uma vez identificadas variáveis qualitativas adicionais, conforme explorado na análise anterior, foi possível analisar a distruibuição e frequência das categorias dessas variáveis no dataset.
+
+```Python
+#Algumas variáveis sofreram o problema de ponderação arbitrária
+#passando variáveis quanti para quali
+
+df_quali_adicionais = df_quant[['recyclable_package', 'low_fat', 'coffee_bar', 'video_store','salad_bar','prepared_food','florist']]
+df_quali_adicionais = df_quali_adicionais.replace({0: 'Não', 1: 'Sim'})
+
+for variavel in df_quali_adicionais:
+    freq_rel = pd.crosstab(index=df_quali_adicionais[variavel], columns='Porcentagem', normalize=True).sort_values('Porcentagem' ,ascending = False)
+    freq_rel['Porcentagem'] = (freq_rel['Porcentagem']*100).round(2)
+    #configurando e gerando plot em barras
+    ax5 = sns.barplot(data=freq_rel,x=variavel,y='Porcentagem',hue='Porcentagem',palette='rocket')
+    ax5.set_box_aspect(1/3)
+    for container in ax5.containers: ax5.bar_label(container, fmt='%.2f',padding = 3,fontsize=8)
+    plt.Figure(figsize=(20,6), dpi = 20)
+    plt.title(f'Frequência - {variavel}', fontsize=10)
+    plt.xlabel('Categorias', fontsize=8)
+    plt.ylabel('Porcentagem', fontsize=8)
+    plt.xticks(fontsize=6)
+    plt.yticks(fontsize=6)
+    plt.legend(title="Porcentagem", fontsize=5, title_fontsize=12, loc="upper right")
+    plt.show()
+```
+<p align='center'>
+<img src="Imagens/Adicionais (1).png" width="25%">
+<img src="Imagens/Adicionais (2).png" width="25%">
+<img src="Imagens/Adicionais (3).png" width="25%">
+<img src="Imagens/Adicionais (4).png" width="25%">
+<img src="Imagens/Adicionais (5).png" width="25%">
+<img src="Imagens/Adicionais (6).png" width="25%">
+<img src="Imagens/Adicionais (7).png" width="25%">
+</p>
+
+## Resultados e discussão
+
+A variável cost apresenta uma distribuição sem um padrão bem definido, caracterizada por múltiplos picos, o que sugere a influência de diferentes fatores na sua variação. O boxplot confirma a ausência significativa de outliers, mas evidencia uma ampla dispersão dos valores, indicando que o custo de aquisição de clientes varia substancialmente entre campanhas ou perfis de consumidores. Essa análise será essencial para identificar correlações com variáveis como tipo de loja, promoção e características do público, permitindo compreender melhor os determinantes desse custo.
