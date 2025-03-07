@@ -415,3 +415,46 @@ Clientes com renda entre $30K e $50K são os mais propensos a comprar produtos e
 <p align='center'> <img src="Imagens/Quali_uni_especifico (4).png" width="40%"></p>
 
 A maior parte das vendas promocionais ocorre em supermercados tradicionais (43,34%) e deluxe supermarkets (37,99%), indicando que esses formatos de loja são os mais propensos a oferecer e impulsionar promoções. Já Gourmet Supermarkets possuem uma participação muito menor (10,76%), o que pode indicar que clientes desses estabelecimentos são menos sensíveis a descontos diretos. Pequenos mercados (Mid-Size Grocery e Small Grocery) representam uma fatia marginal das vendas promocionais, sugerindo que promoções nesses locais podem precisar de estratégias diferenciadas para aumentar a adesão.
+
+# Análise Univariada: Variáveis quantitativas
+
+1. Criando um dataframe com as variáveis quantitativas:
+```Python
+#Variáveis quantitativas
+colunas_quant = df.select_dtypes(include = np.number).columns
+
+#Criando dataframe apenas com variáveis quantitativas
+df_quant = df.select_dtypes(include = np.number)
+```
+2. Identificando e tratando outliers:
+
+O método utilizado para a limpeza de outliers foi o método IQR (Interquartile Range), conforme ilustrado abaixo.
+<p align='center'> <img src="Imagens/IQR.png" width="40%"></p>
+
+Aplicando o método:
+```Python
+#Criando função para remover outliers usando IQR
+def remove_outliers(dataframe):
+    for variavel in dataframe:
+        #calculando IQR
+        Q1 = dataframe[variavel].quantile(0.25)
+        Q3 = dataframe[variavel].quantile(0.75)
+        IQR = Q3 - Q1
+        limite_sup = Q3 + 1.5*IQR
+        limite_inf = Q1 - 1.5*IQR
+        #criando array para definir posição dos outliers
+        array_sup = dataframe[dataframe[variavel] >= limite_sup].index
+        array_inf =dataframe[dataframe[variavel] <= limite_inf].index
+        #removendo outliers
+        dataframe = dataframe.drop(index=array_sup).drop(index=array_inf)
+    return dataframe
+
+#chamando função que remove outliers pelo método IQR
+df_quant = remove_outliers(df_quant)
+```
+3. Explorando distribuições dos dados quantitativos:
+```Python
+#Exploração inicial dos dados quantitativos
+dados_colunas_quant = df.select_dtypes(exclude=['object']).describe().T
+```
+<p align='center'> <img src="Imagens/Quanti_geral_explorar.png" width="40%"></p>
