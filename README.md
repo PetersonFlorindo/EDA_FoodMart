@@ -476,7 +476,7 @@ for variavel in df_quant:
     plt.xlabel('Valor')
     plt.show()
 ```
-A distribuição das variáveis quantitativas revelou os seguintes padrões estatísticos: 
+A distribuição das variáveis quantitativas revelou os seguintes padrões estatísticos (clique na imagem para ampliado): 
 <p align='center'>
     <img src="Imagens/Quanti_Geral (2).png" width="10%">
     <img src="Imagens/Quanti_Geral (1).png" width="10%">
@@ -565,4 +565,21 @@ for variavel in df_quali_adicionais:
 
 ## Resultados e discussão
 
-A variável cost apresenta uma distribuição sem um padrão bem definido, caracterizada por múltiplos picos, o que sugere a influência de diferentes fatores na sua variação. O boxplot confirma a ausência significativa de outliers, mas evidencia uma ampla dispersão dos valores, indicando que o custo de aquisição de clientes varia substancialmente entre campanhas ou perfis de consumidores. Essa análise será essencial para identificar correlações com variáveis como tipo de loja, promoção e características do público, permitindo compreender melhor os determinantes desse custo.
+A variável cost apresenta uma distribuição sem um padrão bem definido, caracterizada por múltiplos picos, o que sugere a influência de diferentes fatores na sua variação. O boxplot confirma a ausência significativa de outliers,resultado do tratamento feito nos dados, mas evidencia uma ampla dispersão dos valores, indicando que o custo de aquisição de clientes varia substancialmente entre campanhas ou perfis de consumidores. Essa análise será essencial para identificar correlações com variáveis como tipo de loja, promoção e características do público, permitindo compreender melhor os determinantes desse custo.
+
+# Análise multivariada: Variáveis quantitativas x variáveis quantitativas
+
+Para a análise multivariada entre variáveis quantitativas, foi aplicada a matriz de correlação utilizando o coeficiente de Pearson.
+
+```Python
+#Análise Quanti x Quanti
+plt.figure(figsize = (20,10))
+sns.heatmap(df_quant.corr(), annot= True)
+plt.title('Matriz de correlação')
+plt.show()
+```
+<p align='center'><img src="Imagens/corr.png" width="70%"></p>
+
+## Resultados e discussão
+
+A variável cost, o custo de aquisição de cliente, não apresenta correlação significativa com nenhuma outra variável quantitativa.  Essa ausência de correlação sugere que cost pode ser influenciado por variáveis categóricas, conforme será verificado na próxima etapa da análise.
