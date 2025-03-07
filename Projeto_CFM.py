@@ -5,6 +5,8 @@ import pandas as pd
 
 df = pd.read_csv('base_CFM.csv')
 
+
+
 #%%
 #Análise da estrutura e qualidade dos dados
 
@@ -13,6 +15,10 @@ df.shape
 
 #Verificando colunas
 df.columns
+
+#removendo variável duplicada
+df = df.drop(columns='avg_cars_at home(approx).1')
+
 
 #Verificando dados duplicados
 df.duplicated().sum()
@@ -49,7 +55,7 @@ colunas_quant = df.select_dtypes(include = np.number).columns
 df_quant = df.select_dtypes(include = np.number)
 
 #Exploração inicial dos dados quanti
-dados_colunas_quant = df.select_dtypes(exclude=['object']).describe()
+dados_colunas_quant = df.select_dtypes(exclude=['object']).describe().T
 
 #Análise das variáveis qualitativas: Frequência absoluta
 for variavel in df_quali:
@@ -97,7 +103,7 @@ plt.yticks(fontsize=6)
 plt.legend(title="Porcentagem", fontsize=5, title_fontsize=12, loc="upper right")
 plt.show()
 
-#criação de tabela de contigência por tipo de mercado
+#criação de tabela de contigência por tipo de cliente
 freq_rel_member_card = pd.crosstab(index=df_quali['member_card'], columns='Porcentagem', normalize=True).sort_values('Porcentagem' ,ascending = False)
 freq_rel_member_card['Porcentagem'] = (freq_rel_member_card['Porcentagem']*100).round(2)
 #configurando e gerando plot em barras
@@ -105,7 +111,7 @@ ax2 = sns.barplot(data=freq_rel_member_card,x='member_card',y='Porcentagem',hue=
 ax2.set_box_aspect(1/3)
 for container in ax2.containers: ax2.bar_label(container, fmt='%.2f',padding = 3,fontsize=8)
 plt.Figure(figsize=(20,6), dpi = 20)
-plt.title('Distribuição das vendas em promoção por de cliente', fontsize=10)
+plt.title('Distribuição das vendas em promoção por tipo de cliente', fontsize=10)
 plt.xlabel('Categorias', fontsize=8)
 plt.ylabel('% das vendas em promoção', fontsize=8)
 plt.xticks(fontsize=6)
@@ -130,10 +136,10 @@ plt.legend(title="Porcentagem", fontsize=5, title_fontsize=12, loc="upper right"
 plt.show()
 
 #criação de tabela de contigência por renda
-freq_rel_income = pd.crosstab(index=df_quali['avg. yearly_income'], columns='Porcentagem', normalize=True).sort_values('Porcentagem' ,ascending = False)
+freq_rel_income = pd.crosstab(index=df_quali['avg. yearly_income'], columns='Porcentagem', normalize=True)
 freq_rel_income['Porcentagem'] = (freq_rel_income['Porcentagem']*100).round(2)
 #configurando e gerando plot em barras
-ax4 = sns.barplot(data=freq_rel_income,x='avg. yearly_income',y='Porcentagem',hue='Porcentagem',palette='rocket')
+ax4 = sns.barplot(data=freq_rel_income,x='avg. yearly_income',y='Porcentagem',hue='Porcentagem',palette='rocket',order=['$10K - $30K', '$30K - $50K', '$50K - $70K', '$70K - $90K', '$90K - $110K', '$110K - $130K', '$130K - $150K', '$150K +'])
 ax4.set_box_aspect(1/3)
 for container in ax4.containers: ax4.bar_label(container, fmt='%.2f',padding = 3,fontsize=8)
 plt.Figure(figsize=(20,6), dpi = 20)
@@ -167,7 +173,6 @@ def remove_outliers(dataframe):
 df_quant = remove_outliers(df_quant)
 
 for variavel in df_quant:
-    #ordena variáveis em ordem decrescente
     plt.Figure(figsize=(20,10))
     sns.displot(x=df_quant[variavel], kde= True)
     plt.title(f'Distribuição de valores - {variavel}')
@@ -183,6 +188,14 @@ for variavel in df_quant:
     plt.show()
 
 #Algumas variáveis sofreram o problema de ponderação arbitrária
+#corrigindo colunas no dataframe original
+df[['recyclable_package', 'low_fat', 'coffee_bar', 'video_store','salad_bar','prepared_food','florist']] = df[['recyclable_package', 'low_fat', 'coffee_bar', 'video_store','salad_bar','prepared_food','florist']].replace({0: 'Não', 1: 'Sim'})
+#Variáveis qualitativas
+colunas_quali = df.select_dtypes(include=['object']).columns
+
+#Criando dataframe apenas com variáveis qualitativas
+df_quali = df.select_dtypes(include=['object'])
+
 #passando variáveis quanti para quali
 
 df_quali_adicionais = df_quant[['recyclable_package', 'low_fat', 'coffee_bar', 'video_store','salad_bar','prepared_food','florist']]
