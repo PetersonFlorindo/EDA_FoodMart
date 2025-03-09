@@ -583,3 +583,44 @@ plt.show()
 ## Resultados e discussão
 
 A variável cost, o custo de aquisição de cliente, não apresenta correlação significativa com nenhuma outra variável quantitativa.  Essa ausência de correlação sugere que cost pode ser influenciado por variáveis categóricas, conforme será verificado na próxima etapa da análise.
+
+# Análise multivariada: Variáveis quantitativas x variáveis qualitativa (ANOVA)
+
+```Python
+for variavel in colunas_quali:
+    #ajusta um modelo de regressão com a variável qualitativa como preditora de 'cost'
+    modelo = ols('cost ~ ' + variavel , data = df).fit()
+    #realiza a análise de variância (ANOVA) no modelo ajustado
+    tabela = sm.stats.anova_lm(modelo , typ = 2)
+    #adiciona linha nova
+    tabela_anova.loc[len(tabela_anova)] = [variavel, tabela.loc[variavel , 'F'], tabela.loc[variavel , 'PR(>F)']]
+
+tabela_anova.sort_values(by = 'F' , ascending = False)
+Out[54]: 
+              Variavel           F        P valor
+19         video_store  756.741111  1.448079e-165
+21       prepared_food  557.302851  1.169470e-122
+20           salad_bar  557.302851  1.169470e-122
+22             florist  464.494745  1.233454e-102
+3       promotion_name  454.064727   0.000000e+00
+23          media_type  361.675086   0.000000e+00
+15          store_type  343.549641  5.850269e-293
+18          coffee_bar  224.635239   1.087965e-50
+16          store_city  180.321671   0.000000e+00
+17         store_state  175.325986   0.000000e+00
+4        sales_country   44.985905   3.001930e-20
+9           occupation    5.615314   1.624826e-04
+6               gender    4.472946   3.443965e-02
+11   avg_yearly_income    3.638462   6.274140e-04
+7            education    1.542778   1.867438e-01
+14             low_fat    1.069499   3.010627e-01
+2          food_family    1.031029   3.566461e-01
+0        food_category    1.021255   4.325438e-01
+12          brand_name    0.886028   7.977583e-01
+8          member_card    0.848373   4.671980e-01
+10          houseowner    0.693552   4.049621e-01
+1      food_department    0.686849   8.506897e-01
+13  recyclable_package    0.178741   6.724592e-01
+5       marital_status    0.029707   8.631564e-01
+```
+
