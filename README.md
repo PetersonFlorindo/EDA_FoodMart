@@ -586,41 +586,54 @@ A variável cost, o custo de aquisição de cliente, não apresenta correlação
 
 # Análise multivariada: Variáveis quantitativas x variáveis qualitativa (ANOVA)
 
-```Python
-for variavel in colunas_quali:
-    #ajusta um modelo de regressão com a variável qualitativa como preditora de 'cost'
-    modelo = ols('cost ~ ' + variavel , data = df).fit()
-    #realiza a análise de variância (ANOVA) no modelo ajustado
-    tabela = sm.stats.anova_lm(modelo , typ = 2)
-    #adiciona linha nova
-    tabela_anova.loc[len(tabela_anova)] = [variavel, tabela.loc[variavel , 'F'], tabela.loc[variavel , 'PR(>F)']]
+Para a análise da relação do custo de aquisição de clientes, foi utilizado o teste de Kruskal-Wallis em vez da ANOVA por não exigir que os dados sigam uma distribuição normal ou que as variâncias entre os grupos sejam homogêneas. Com essa análise, será possível identificar se há diferenças estatisticamente significativas no custo de aquisição em função das variáveis categóricas.
 
-tabela_anova.sort_values(by = 'F' , ascending = False)
-Out[54]: 
-              Variavel           F        P valor
-19         video_store  756.741111  1.448079e-165
-21       prepared_food  557.302851  1.169470e-122
-20           salad_bar  557.302851  1.169470e-122
-22             florist  464.494745  1.233454e-102
-3       promotion_name  454.064727   0.000000e+00
-23          media_type  361.675086   0.000000e+00
-15          store_type  343.549641  5.850269e-293
-18          coffee_bar  224.635239   1.087965e-50
-16          store_city  180.321671   0.000000e+00
-17         store_state  175.325986   0.000000e+00
-4        sales_country   44.985905   3.001930e-20
-9           occupation    5.615314   1.624826e-04
-6               gender    4.472946   3.443965e-02
-11   avg_yearly_income    3.638462   6.274140e-04
-7            education    1.542778   1.867438e-01
-14             low_fat    1.069499   3.010627e-01
-2          food_family    1.031029   3.566461e-01
-0        food_category    1.021255   4.325438e-01
-12          brand_name    0.886028   7.977583e-01
-8          member_card    0.848373   4.671980e-01
-10          houseowner    0.693552   4.049621e-01
-1      food_department    0.686849   8.506897e-01
-13  recyclable_package    0.178741   6.724592e-01
-5       marital_status    0.029707   8.631564e-01
+```Python
+#analise quanti x quali
+    
+import pandas as pd
+from scipy.stats import kruskal
+
+#Criando um dicionário para armazenar os resultados
+kruskal_results = {}
+
+#aplicando o teste de Kruskal-Wallis para cada variável qualitativa em relação ao custo
+for var in colunas_quali:
+    #Criando os grupos de "cost" para cada categoria na variável categórica
+    grupos = [df[df[var] == categoria]["cost"] for categoria in df[var].unique()]
+    print(grupos)
+    H, p_valor = kruskal(*grupos)
+    kruskal_results[var] = {"H": H, "p_valor": p_valor}
+
+#Criando um DataFrame para visualizar os resultados
+kruskal_df = pd.DataFrame.from_dict(kruskal_results, orient='index')
+kruskal_significativo = kruskal_df[kruskal_df['p_valor']<=0.05]
+
+#salvando variáveis significativas
+colunas_kruskal = kruskal_significativo.index
 ```
+<p align='center'>
+<img src="Imagens/df_kurkal.png" width="25%">
+</p>
+
+Os gráficos a seguir mostram a distribuição do custo de aquisição de clientes para as variáveis categóricas que mostraram diferenças significativas no teste de Kruskal-Wallis. A visualização em boxplot destaca a dispersão e a mediana dos grupos. (Clique na imagem para ampliá-la).
+
+<p align='center'>
+    <img src="Imagens/grafico_kruskal (1).png" width="30%">
+    <img src="Imagens/grafico_kruskal (2).png" width="30%">
+    <img src="Imagens/grafico_kruskal (3).png" width="30%">
+    <img src="Imagens/grafico_kruskal (4).png" width="30%">
+    <img src="Imagens/grafico_kruskal (5).png" width="30%">
+    <img src="Imagens/grafico_kruskal (6).png" width="30%">
+    <img src="Imagens/grafico_kruskal (7).png" width="30%">
+    <img src="Imagens/grafico_kruskal (8).png" width="30%">
+    <img src="Imagens/grafico_kruskal (9).png" width="30%">
+    <img src="Imagens/grafico_kruskal (10).png" width="30%">
+    <img src="Imagens/grafico_kruskal (11).png" width="30%">
+    <img src="Imagens/grafico_kruskal (12).png" width="30%">
+    <img src="Imagens/grafico_kruskal (13).png" width="30%">
+    <img src="Imagens/grafico_kruskal (14).png" width="30%">
+</p>
+
+## Resultados e discussão
 
