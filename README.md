@@ -637,3 +637,4 @@ Os gráficos a seguir mostram a distribuição do custo de aquisição de client
 
 ## Resultados e discussão
 
+Os gráficos mostram como o custo de aquisição varia entre diferentes variáveis categóricas, revelando diferenças significativas entre os grupos. No entanto, a alta variabilidade dentro de algumas categorias pode dificultar a identificação de padrões mais claros. Para entender melhor essas variações, a próxima etapa da análise será focada na segmentação dos custos em clusters, permitindo agrupar faixas de valores semelhantes e identificar como diferentes variáveis qualitativas, como tipo de mídia e promoção aplicada, estão associadas a cada nível de custo.
