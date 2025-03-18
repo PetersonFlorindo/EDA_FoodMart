@@ -217,14 +217,208 @@ for variavel in df_quali_adicionais:
     plt.legend(title="Porcentagem", fontsize=5, title_fontsize=12, loc="upper right")
     plt.show()
 
-#Iniciando análise bivariada
-df_quant_corrigido = df_quant.drop(columns=df_quali_adicionais.columns)
-df_quant_corrigido = df_quant_corrigido.drop(columns='avg_cars_at home(approx).1')
 #Análise Quanti x Quanti
 plt.figure(figsize = (20,10))
-sns.heatmap(df_quant_corrigido.corr(), annot= True)
+sns.heatmap(df_quant.corr(), annot= True)
 plt.title('Matriz de correlação')
 plt.show()
 
 #analise quanti x quali
-        
+    
+import pandas as pd
+from scipy.stats import kruskal
+
+# Criar um dicionário para armazenar os resultados
+kruskal_results = {}
+
+# Aplicar o teste de Kruskal-Wallis para cada variável qualitativa em relação ao custo
+for var in colunas_quali:
+    # Criar os grupos de "cost" para cada categoria na variável categórica
+    grupos = [df[df[var] == categoria]["cost"] for categoria in df[var].unique()]
+    print(grupos)
+    H, p_valor = kruskal(*grupos)
+    kruskal_results[var] = {"H": H, "p_valor": p_valor}
+
+# Criar um DataFrame para visualizar os resultados
+kruskal_df = pd.DataFrame.from_dict(kruskal_results, orient='index')
+kruskal_significativo = kruskal_df[kruskal_df['p_valor']<=0.05]
+
+colunas_kruskal = kruskal_significativo.index
+
+for variavel in colunas_kruskal:
+    plt.figure(figsize=(10, 5))
+    sns.boxplot(x=df[variavel], y=df['cost'], palette='coolwarm')
+    plt.title(f'Distribuição do Custo por {variavel} (Violino)')
+    plt.ylabel('Custo')
+    plt.xlabel(variavel)
+    plt.xticks(rotation=90)
+    plt.show()
+
+#%%
+
+from sklearn.mixture import GaussianMixture
+import numpy as np
+
+# Ajustar um modelo GMM na distribuição de 'cost'
+cost_values = df["cost"].values.reshape(-1, 1)
+gmm = GaussianMixture(n_components=3, random_state=42).fit(cost_values)
+
+# Gerar pontos para plotar a distribuição ajustada
+x = np.linspace(df["cost"].min(), df["cost"].max(), 1000)
+densidade = np.exp(gmm.score_samples(x.reshape(-1, 1)))
+
+# Plotar a distribuição real e a ajustada pelo GMM
+plt.figure(figsize=(10,6))
+sns.histplot(df["cost"], bins=30, color="gray", kde=False, stat="density", alpha=0.6)
+plt.plot(x, densidade, color="red", label="GMM Ajustado")
+plt.title("Ajuste de Mistura Gaussiana ao Custo")
+plt.legend()
+plt.show()
+
+df["cost_cluster"] = gmm.predict(df["cost"].values.reshape(-1, 1))
+
+# Ver a distribuição de custo por cluster identificado
+sns.boxplot(x="cost_cluster", y="cost", data=df)
+plt.title("Boxplot do Custo por Cluster GMM")
+plt.show()
+
+pd.crosstab(df["cost_cluster"], df["media_type"], normalize="index") * 100
+pd.crosstab(df["cost_cluster"], df["promotion_name"], normalize="index") * 100
+
+import scipy.stats as stats
+
+# Criar tabela de contingência (cross-tabulação)
+contingencia = pd.crosstab(df["cost_cluster"], df["media_type"])
+
+# Aplicar teste qui-quadrado
+chi2, p, dof, expected = stats.chi2_contingency(contingencia)
+
+# Exibir resultados
+print(f"Estatística Qui-Quadrado: {chi2:.4f}")
+print(f"Valor-p: {p:.4f}")
+
+# Interpretar resultado
+if p < 0.05:
+    print("Existe associação significativa entre cost_cluster e media_type.")
+else:
+    print("Não há evidências suficientes para associação entre cost_cluster e media_type.")
+    
+df_contingencia = pd.crosstab(df["cost_cluster"], df["media_type"])
+
+
+# Criar tabela de contingência entre promoção e categoria de custo
+contingencia = pd.crosstab(df["cost_category"], df["promotion_name"])
+
+# Aplicar teste qui-quadrado
+chi2, p, dof, expected = stats.chi2_contingency(contingencia)
+
+# Exibir resultado
+print(f"Estatística Qui-Quadrado: {chi2:.4f}")
+print(f"Valor-p: {p:.4f}")
+
+# Interpretar
+if p < 0.05:
+    print("Existe associação significativa entre cost_category e promotion_name.")
+else:
+    print("Não há evidências suficientes para associação entre cost_category e promotion_name.")
+
+df["cost_cluster"] = df["cost_cluster"].replace({0: 'Alto', 1: 'Baixo', 2: 'Médio'})
+df_contingencia_media = pd.crosstab(df["cost_cluster"], df["media_type"]).T
+df_contingencia_promotion = pd.crosstab(df["cost_cluster"], df["promotion_name"]).T
+
+# Normalizar os valores (transformar em porcentagem por linha)
+df_contingencia_media = df_contingencia_media.div(df_contingencia_media.sum(axis=1), axis=0) * 100
+df_contingencia_promotion = df_contingencia_promotion.div(df_contingencia_promotion.sum(axis=1), axis=0) * 100
+
+# Criar tabelas de contingência normalizadas
+df_contingencia_media = pd.crosstab(df["cost_cluster"], df["media_type"])
+df_contingencia_promotion = pd.crosstab(df["cost_cluster"], df["promotion_name"])
+
+# Normalizar os valores (transformar em porcentagem por linha)
+df_contingencia_media = df_contingencia_media.div(df_contingencia_media.sum(axis=1), axis=0) * 100
+df_contingencia_promotion = df_contingencia_promotion.div(df_contingencia_promotion.sum(axis=1), axis=0) * 100
+
+
+# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
+df_contingencia_promotion = df_contingencia_promotion.sort_values(by="Baixo", ascending=False)
+
+# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
+plt.figure(figsize=(14, 6))
+plt.plot(df_contingencia_promotion.index, df_contingencia_promotion["Baixo"], marker="o", linestyle="-", color="blue", label="Cluster Baixo")
+plt.title("Variação da Porcentagem do Cluster 'Baixo' por Promotion Name")
+plt.ylabel("Percentual (%)")
+plt.xticks(rotation=90)
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
+plt.figure(figsize=(14, 6))
+sns.heatmap(df_contingencia_promotion[["Baixo"]], cmap="Blues", annot=True, fmt=".1f")
+plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Promotion Name")
+plt.xlabel("Cluster Baixo")
+plt.ylabel("Promotion Name")
+plt.show()
+
+# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
+df_contingencia_promotion = df_contingencia_promotion.sort_values(by="Alto", ascending=False)
+
+# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
+plt.figure(figsize=(14, 6))
+plt.plot(df_contingencia_promotion.index, df_contingencia_promotion["Alto"], marker="o", linestyle="-", color="blue", label="Cluster Alto")
+plt.title("Variação da Porcentagem do Cluster 'Alto' por Promotion Name")
+plt.ylabel("Percentual (%)")
+plt.xticks(rotation=90)
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
+plt.figure(figsize=(14, 6))
+sns.heatmap(df_contingencia_promotion[["Alto"]], cmap="Blues", annot=True, fmt=".1f")
+plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Promotion Name")
+plt.xlabel("Cluster Alto")
+plt.ylabel("Promotion Name")
+plt.show()
+
+# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
+df_contingencia_promotion = df_contingencia_promotion.sort_values(by="Médio", ascending=False)
+
+# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
+plt.figure(figsize=(14, 6))
+plt.plot(df_contingencia_promotion.index, df_contingencia_promotion["Médio"], marker="o", linestyle="-", color="blue", label="Cluster Médio")
+plt.title("Variação da Porcentagem do Cluster 'Médio' por Promotion Name")
+plt.ylabel("Percentual (%)")
+plt.xticks(rotation=90)
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
+plt.figure(figsize=(14, 6))
+sns.heatmap(df_contingencia_promotion[["Médio"]], cmap="Blues", annot=True, fmt=".1f")
+plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Promotion Name")
+plt.xlabel("Cluster Médio")
+plt.ylabel("Promotion Name")
+plt.show()
+
+# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
+df_contingencia_media= df_contingencia_media.sort_values(by="Baixo", ascending=False)
+
+# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
+plt.figure(figsize=(14, 6))
+plt.plot(df_contingencia_media.index, df_contingencia_media["Baixo"], marker="o", linestyle="-", color="blue", label="Cluster Baixo")
+plt.title("Variação da Porcentagem do Cluster 'Baixo' por Media")
+plt.ylabel("Percentual (%)")
+plt.xticks(rotation=90)
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
+plt.figure(figsize=(14, 6))
+sns.heatmap(df_contingencia_media[["Baixo"]], cmap="Blues", annot=True, fmt=".1f")
+plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Media")
+plt.xlabel("Cluster Baixo")
+plt.ylabel("Media")
+plt.show()
