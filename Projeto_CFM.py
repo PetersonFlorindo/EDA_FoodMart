@@ -228,21 +228,22 @@ plt.show()
 import pandas as pd
 from scipy.stats import kruskal
 
-# Criar um dicionário para armazenar os resultados
-kruskal_results = {}
+#Criando um dicionário para armazenar os resultados
+kruskal_resultados = {}
 
-# Aplicar o teste de Kruskal-Wallis para cada variável qualitativa em relação ao custo
+#aplicando o teste de Kruskal-Wallis para cada variável qualitativa em relação ao custo
 for var in colunas_quali:
-    # Criar os grupos de "cost" para cada categoria na variável categórica
+    #Criando os grupos de "cost" para cada categoria na variável categórica
     grupos = [df[df[var] == categoria]["cost"] for categoria in df[var].unique()]
     print(grupos)
     H, p_valor = kruskal(*grupos)
-    kruskal_results[var] = {"H": H, "p_valor": p_valor}
+    kruskal_resultados[var] = {"H": H, "p_valor": p_valor}
 
-# Criar um DataFrame para visualizar os resultados
-kruskal_df = pd.DataFrame.from_dict(kruskal_results, orient='index')
+#Criando um DataFrame para visualizar os resultados
+kruskal_df = pd.DataFrame.from_dict(kruskal_resultados, orient='index')
 kruskal_significativo = kruskal_df[kruskal_df['p_valor']<=0.05]
 
+#salvando variáveis significativas
 colunas_kruskal = kruskal_significativo.index
 
 for variavel in colunas_kruskal:
@@ -259,166 +260,379 @@ for variavel in colunas_kruskal:
 from sklearn.mixture import GaussianMixture
 import numpy as np
 
-# Ajustar um modelo GMM na distribuição de 'cost'
+#Ajustando um modelo GMM na distribuição de 'cost'
 cost_values = df["cost"].values.reshape(-1, 1)
 gmm = GaussianMixture(n_components=3, random_state=42).fit(cost_values)
 
-# Gerar pontos para plotar a distribuição ajustada
+#Gerando pontos para plotar a distribuição ajustada
 x = np.linspace(df["cost"].min(), df["cost"].max(), 1000)
 densidade = np.exp(gmm.score_samples(x.reshape(-1, 1)))
 
-# Plotar a distribuição real e a ajustada pelo GMM
+#Plotando a distribuição real e a ajustada pelo GMM
 plt.figure(figsize=(10,6))
 sns.histplot(df["cost"], bins=30, color="gray", kde=False, stat="density", alpha=0.6)
 plt.plot(x, densidade, color="red", label="GMM Ajustado")
-plt.title("Ajuste de Mistura Gaussiana ao Custo")
+plt.title("Ajuste de Mistura Gaussiana - Custo")
 plt.legend()
 plt.show()
 
-df["cost_cluster"] = gmm.predict(df["cost"].values.reshape(-1, 1))
+df["cluster_custo"] = gmm.predict(df["cost"].values.reshape(-1, 1))
 
-# Ver a distribuição de custo por cluster identificado
+#Distribuição de custo por cluster identificado
 sns.boxplot(x="cost_cluster", y="cost", data=df)
 plt.title("Boxplot do Custo por Cluster GMM")
 plt.show()
 
-pd.crosstab(df["cost_cluster"], df["media_type"], normalize="index") * 100
-pd.crosstab(df["cost_cluster"], df["promotion_name"], normalize="index") * 100
+df["cluster_custo"] = df["cluster_custo"].replace({0: 'Alto', 1: 'Baixo', 2: 'Médio'})
+
+
+#%%
 
 import scipy.stats as stats
 
-# Criar tabela de contingência (cross-tabulação)
-contingencia = pd.crosstab(df["cost_cluster"], df["media_type"])
+#Criando um dicionário para armazenar os resultados
+resultados_chi2 = {}
 
-# Aplicar teste qui-quadrado
-chi2, p, dof, expected = stats.chi2_contingency(contingencia)
+for var in colunas_kruskal:
+    #criando tabela d contigência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var])
+    # Aplicar teste qui-quadrado
+    chi2, p_valor, dof, expected = stats.chi2_contingency(contingencia)
+    resultados_chi2[var] = {"chi2": chi2, "p_valor": p_valor}
 
-# Exibir resultados
-print(f"Estatística Qui-Quadrado: {chi2:.4f}")
-print(f"Valor-p: {p:.4f}")
+#Criando um DataFrame para visualizar os resultados
+chi2_df = pd.DataFrame.from_dict(resultados_chi2, orient='index')
+chi2_significativo = chi2_df[kruskal_df['p_valor']<=0.05]
 
-# Interpretar resultado
-if p < 0.05:
-    print("Existe associação significativa entre cost_cluster e media_type.")
-else:
-    print("Não há evidências suficientes para associação entre cost_cluster e media_type.")
+#salvando variáveis significativas
+colunas_chi2 = chi2_significativo.index
+
+#faixas de custo
+custos = ["Baixo", "Médio", "Alto"]
+dic_cor = {"Baixo": "green", "Médio": "orange", "Alto": "red"}
+
+for var in colunas_chi2:
+    #criando tabela de contigência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
+    #normalizando valores
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
+    for custo in custos:
+        contingencia = contingencia.sort_values(by=custo, ascending = False)
+         #Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
+        plt.figure(figsize=(14, 6))
+        plt.plot(contingencia.index, contingencia[custo], marker="o", linestyle="-", color=dic_cor[custo], label=f"Cluster {custo}")
+        plt.title(f"Variação da Porcentagem do Cluster {custo} por {var}")
+        plt.ylabel("Percentual (%)")
+        plt.xticks(rotation=90)
+        plt.legend()
+        plt.grid(True)
+        plt.show()
     
-df_contingencia = pd.crosstab(df["cost_cluster"], df["media_type"])
+
+for var in colunas_chi2:
+    # Criando tabela de contingência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
+
+    # Normalizando valores (percentual dos clusters por categoria)
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
+
+    # Criando DataFrame com percentual das categorias
+    percentual_categoria = df[var].value_counts(normalize=True) * 100
+
+    for custo in custos:
+        # Ordenando pela porcentagem do cluster
+        contingencia = contingencia.sort_values(by=custo, ascending=False)
+        percentual_categoria = percentual_categoria.reindex(contingencia.index)
+
+        # Criando a figura com dois eixos
+        fig, ax1 = plt.subplots(figsize=(14, 6))
+
+        # Gráfico de linha - Variação da porcentagem por categoria
+        ax1.plot(contingencia.index, contingencia[custo], marker="o", linestyle="-", color=dic_cor[custo], label=f"Cluster {custo}")
+        ax1.set_ylabel("Percentual Cluster (%)", color=dic_cor[custo])
+        ax1.tick_params(axis='y', labelcolor=dic_cor[custo])
+        ax1.legend(loc="upper left")
+        ax1.grid(True)
+
+        # Criando um segundo eixo y para o countplot percentual
+        ax2 = ax1.twinx()
+
+        # Countplot percentual - Percentual das categorias
+        sns.barplot(x=contingencia.index, y=percentual_categoria, ax=ax2, color="gray", alpha=0.3, label="Percentual (%)")
+
+        ax2.set_ylabel("Percentual (%)", color="gray")
+        ax2.tick_params(axis='y', labelcolor="gray")
+
+        # **Garantindo que os dois eixos comecem no zero e tenham a mesma escala**
+        ax1.set_ylim(0, max(contingencia[custo].max(), percentual_categoria.max()) * 1.1)
+        ax2.set_ylim(0, max(contingencia[custo].max(), percentual_categoria.max()) * 1.1)
+
+        # Ajustando rótulos e título
+        plt.title(f"Variação da Porcentagem do Cluster {custo} por {var} com Percentual das Categorias")
+        ax1.set_xticklabels(contingencia.index, rotation=90)
+
+        # Adicionando legenda
+        ax2.legend(loc="upper right")
+
+        # Exibir gráfico
+        plt.show()
 
 
-# Criar tabela de contingência entre promoção e categoria de custo
-contingencia = pd.crosstab(df["cost_category"], df["promotion_name"])
+for var in colunas_chi2:
+    # Criando tabela de contingência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
 
-# Aplicar teste qui-quadrado
-chi2, p, dof, expected = stats.chi2_contingency(contingencia)
+    # Normalizando valores (percentual dos clusters por categoria)
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
 
-# Exibir resultado
-print(f"Estatística Qui-Quadrado: {chi2:.4f}")
-print(f"Valor-p: {p:.4f}")
+    # Criando DataFrame com percentual das categorias (para ordenar)
+    percentual_categoria = df[var].value_counts(normalize=True) * 100
 
-# Interpretar
-if p < 0.05:
-    print("Existe associação significativa entre cost_category e promotion_name.")
-else:
-    print("Não há evidências suficientes para associação entre cost_category e promotion_name.")
+    # Ordenando as categorias pela frequência geral
+    ordenacao_categorias = percentual_categoria.index
 
-df["cost_cluster"] = df["cost_cluster"].replace({0: 'Alto', 1: 'Baixo', 2: 'Médio'})
-df_contingencia_media = pd.crosstab(df["cost_cluster"], df["media_type"]).T
-df_contingencia_promotion = pd.crosstab(df["cost_cluster"], df["promotion_name"]).T
+    for custo in custos:
+        # Aplicando a ordenação pela frequência das categorias
+        contingencia = contingencia.reindex(ordenacao_categorias)
+        percentual_categoria = percentual_categoria.reindex(ordenacao_categorias)
 
-# Normalizar os valores (transformar em porcentagem por linha)
-df_contingencia_media = df_contingencia_media.div(df_contingencia_media.sum(axis=1), axis=0) * 100
-df_contingencia_promotion = df_contingencia_promotion.div(df_contingencia_promotion.sum(axis=1), axis=0) * 100
+        # Criando a figura com dois eixos
+        fig, ax1 = plt.subplots(figsize=(14, 6))
 
-# Criar tabelas de contingência normalizadas
-df_contingencia_media = pd.crosstab(df["cost_cluster"], df["media_type"])
-df_contingencia_promotion = pd.crosstab(df["cost_cluster"], df["promotion_name"])
+        # Gráfico de linha - Variação da porcentagem por categoria
+        ax1.plot(contingencia.index, contingencia[custo], marker="o", linestyle="-", color=dic_cor[custo], label=f"Cluster {custo}")
+        ax1.set_ylabel("Percentual Cluster (%)", color=dic_cor[custo])
+        ax1.tick_params(axis='y', labelcolor=dic_cor[custo])
+        ax1.legend(loc="upper left")
+        ax1.grid(True)
 
-# Normalizar os valores (transformar em porcentagem por linha)
-df_contingencia_media = df_contingencia_media.div(df_contingencia_media.sum(axis=1), axis=0) * 100
-df_contingencia_promotion = df_contingencia_promotion.div(df_contingencia_promotion.sum(axis=1), axis=0) * 100
+        # Criando um segundo eixo y para o countplot percentual
+        ax2 = ax1.twinx()
 
+        # Countplot percentual - Percentual das categorias
+        sns.barplot(x=contingencia.index, y=percentual_categoria, ax=ax2, color="gray", alpha=0.3, label="Percentual (%)")
 
-# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
-df_contingencia_promotion = df_contingencia_promotion.sort_values(by="Baixo", ascending=False)
+        ax2.set_ylabel("Percentual (%)", color="red")
+        ax2.tick_params(axis='y', labelcolor="red")
 
-# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
-plt.figure(figsize=(14, 6))
-plt.plot(df_contingencia_promotion.index, df_contingencia_promotion["Baixo"], marker="o", linestyle="-", color="blue", label="Cluster Baixo")
-plt.title("Variação da Porcentagem do Cluster 'Baixo' por Promotion Name")
-plt.ylabel("Percentual (%)")
-plt.xticks(rotation=90)
-plt.legend()
-plt.grid(True)
-plt.show()
+        # **Garantindo que os dois eixos comecem no zero**
+        ax1.set_ylim(0, max(contingencia[custo].max(), percentual_categoria.max()) * 1.1)
+        ax2.set_ylim(0, max(contingencia[custo].max(), percentual_categoria.max()) * 1.1)
 
-# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
-plt.figure(figsize=(14, 6))
-sns.heatmap(df_contingencia_promotion[["Baixo"]], cmap="Blues", annot=True, fmt=".1f")
-plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Promotion Name")
-plt.xlabel("Cluster Baixo")
-plt.ylabel("Promotion Name")
-plt.show()
+        # Ajustando rótulos e título
+        plt.title(f"Variação da Porcentagem do Cluster {custo} por {var} (Categorias Ordenadas por Frequência)")
+        ax1.set_xticklabels(contingencia.index, rotation=90)
 
-# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
-df_contingencia_promotion = df_contingencia_promotion.sort_values(by="Alto", ascending=False)
+        # Adicionando legenda
+        ax2.legend(loc="upper right")
 
-# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
-plt.figure(figsize=(14, 6))
-plt.plot(df_contingencia_promotion.index, df_contingencia_promotion["Alto"], marker="o", linestyle="-", color="blue", label="Cluster Alto")
-plt.title("Variação da Porcentagem do Cluster 'Alto' por Promotion Name")
-plt.ylabel("Percentual (%)")
-plt.xticks(rotation=90)
-plt.legend()
-plt.grid(True)
-plt.show()
+        # Exibir gráfico
+        plt.show()
 
-# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
-plt.figure(figsize=(14, 6))
-sns.heatmap(df_contingencia_promotion[["Alto"]], cmap="Blues", annot=True, fmt=".1f")
-plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Promotion Name")
-plt.xlabel("Cluster Alto")
-plt.ylabel("Promotion Name")
-plt.show()
+from sklearn.preprocessing import MinMaxScaler
 
-# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
-df_contingencia_promotion = df_contingencia_promotion.sort_values(by="Médio", ascending=False)
+scaler = MinMaxScaler(feature_range=(0, 10))  # Normalizando entre 0 e 10
 
-# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
-plt.figure(figsize=(14, 6))
-plt.plot(df_contingencia_promotion.index, df_contingencia_promotion["Médio"], marker="o", linestyle="-", color="blue", label="Cluster Médio")
-plt.title("Variação da Porcentagem do Cluster 'Médio' por Promotion Name")
-plt.ylabel("Percentual (%)")
-plt.xticks(rotation=90)
-plt.legend()
-plt.grid(True)
-plt.show()
+for var in colunas_chi2:
+    # Criando tabela de contingência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
 
-# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
-plt.figure(figsize=(14, 6))
-sns.heatmap(df_contingencia_promotion[["Médio"]], cmap="Blues", annot=True, fmt=".1f")
-plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Promotion Name")
-plt.xlabel("Cluster Médio")
-plt.ylabel("Promotion Name")
-plt.show()
+    # Normalizando valores (percentual dos clusters por categoria)
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
 
-# Ordenar promotions em ordem decrescente pela porcentagem do cluster "Baixo"
-df_contingencia_media= df_contingencia_media.sort_values(by="Baixo", ascending=False)
+    # Criando DataFrame com percentual das categorias no total (para calcular os índices)
+    percentual_categoria = df[var].value_counts(normalize=True) * 100
 
-# Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
-plt.figure(figsize=(14, 6))
-plt.plot(df_contingencia_media.index, df_contingencia_media["Baixo"], marker="o", linestyle="-", color="blue", label="Cluster Baixo")
-plt.title("Variação da Porcentagem do Cluster 'Baixo' por Media")
-plt.ylabel("Percentual (%)")
-plt.xticks(rotation=90)
-plt.legend()
-plt.grid(True)
-plt.show()
+    # Calculando os índices para "Baixo" e "Alto"
+    contingencia["Indice_Baixo"] = contingencia["Baixo"] / percentual_categoria
+    contingencia["Indice_Alto"] = contingencia["Alto"] / percentual_categoria
 
-# Gráfico 2: Heatmap mostrando apenas a coluna 'Baixo'
-plt.figure(figsize=(14, 6))
-sns.heatmap(df_contingencia_media[["Baixo"]], cmap="Blues", annot=True, fmt=".1f")
-plt.title("Heatmap da Porcentagem do Cluster 'Baixo' por Media")
-plt.xlabel("Cluster Baixo")
-plt.ylabel("Media")
-plt.show()
+    # Removendo possíveis valores NaN e infinito antes da normalização
+    contingencia.replace([np.inf, -np.inf], np.nan, inplace=True)
+    contingencia.dropna(subset=["Indice_Baixo", "Indice_Alto"], inplace=True)
+
+    # Aplicando normalização
+    contingencia[["Indice_Baixo", "Indice_Alto"]] = scaler.fit_transform(contingencia[["Indice_Baixo", "Indice_Alto"]])
+
+    # Ordenando os dados separadamente para os dois índices
+    contingencia_baixo = contingencia.sort_values(by="Indice_Baixo", ascending=False)
+    contingencia_alto = contingencia.sort_values(by="Indice_Alto", ascending=False)
+
+    # Gráfico 1: Índice para "Baixo"
+    plt.figure(figsize=(14, 6))
+    plt.plot(contingencia_baixo.index, contingencia_baixo["Indice_Baixo"], marker="o", linestyle="-", color="blue", label="Índice Baixo (Normalizado)")
+    plt.ylabel("Índice Baixo (0-10)")
+    plt.xticks(rotation=90)
+    plt.title(f"Índice Normalizado do Cluster 'Baixo' por {var}")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # Gráfico 2: Índice para "Alto"
+    plt.figure(figsize=(14, 6))
+    plt.plot(contingencia_alto.index, contingencia_alto["Indice_Alto"], marker="o", linestyle="-", color="red", label="Índice Alto (Normalizado)")
+    plt.ylabel("Índice Alto (0-10)")
+    plt.xticks(rotation=90)
+    plt.title(f"Índice Normalizado do Cluster 'Alto' por {var}")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+    
+scaler = MinMaxScaler(feature_range=(0, 10))  # Normalizando entre 0 e 10
+
+for var in colunas_chi2:
+    # Criando tabela de contingência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
+
+    # Normalizando valores (percentual dos clusters por categoria)
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
+
+    # Criando DataFrame com percentual das categorias no total (para calcular os índices)
+    percentual_categoria = df[var].value_counts(normalize=True) * 100
+
+    # Calculando os índices para "Baixo" e "Alto"
+    contingencia["Indice_Baixo"] = contingencia["Baixo"] / percentual_categoria
+    contingencia["Indice_Alto"] = contingencia["Alto"] / percentual_categoria
+
+    # Removendo possíveis valores NaN e infinito antes da normalização
+    contingencia.replace([np.inf, -np.inf], np.nan, inplace=True)
+    contingencia.dropna(subset=["Indice_Baixo", "Indice_Alto"], inplace=True)
+
+    # Aplicando normalização
+    contingencia[["Indice_Baixo", "Indice_Alto"]] = scaler.fit_transform(contingencia[["Indice_Baixo", "Indice_Alto"]])
+
+    # Ordenando os dados pelo Índice "Baixo"
+    contingencia = contingencia.sort_values(by="Indice_Baixo", ascending=False)
+
+    # Criando o gráfico com os dois índices
+    plt.figure(figsize=(14, 6))
+    plt.plot(contingencia.index, contingencia["Indice_Baixo"], marker="o", linestyle="-", color="blue", label="Índice Baixo (Normalizado)")
+    plt.plot(contingencia.index, contingencia["Indice_Alto"], marker="o", linestyle="-", color="red", label="Índice Alto (Normalizado)")
+
+    plt.ylabel("Índice Normalizado (0-10)")
+    plt.xticks(rotation=90)
+    plt.title(f"Índice Normalizado dos Clusters 'Baixo' e 'Alto' por {var}")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+    
+# Definir número de desvios padrão para exclusão
+num_desvios = 1  
+
+for var in colunas_chi2:
+    # Criar tabela de contingência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
+
+    # Calcular a contagem total das categorias
+    total_categoria = df[var].value_counts()
+
+    # Calcular média e desvio padrão da frequência das categorias
+    media_frequencia = total_categoria.mean()
+    desvio_frequencia = total_categoria.std()
+
+    # Definir limite de exclusão (excluir apenas categorias na cauda esquerda, ou seja, abaixo de 1 desvio padrão)
+    limite_exclusao = media_frequencia - num_desvios * desvio_frequencia
+    categorias_validas = total_categoria[total_categoria >= limite_exclusao].index  # Agora incluímos a média
+
+    # Aplicar filtro para manter apenas categorias acima do limite inferior
+    contingencia = contingencia.loc[categorias_validas]
+
+    # Normalizar valores (percentual dos clusters por categoria)
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
+
+    # Criar DataFrame com percentual das categorias no total (para calcular os índices)
+    percentual_categoria = total_categoria / total_categoria.sum() * 100
+    percentual_categoria = percentual_categoria.loc[categorias_validas]
+
+    # Calcular os índices para "Baixo" e "Alto" sem normalização
+    contingencia["Indice_Baixo"] = contingencia["Baixo"] / percentual_categoria
+    contingencia["Indice_Alto"] = contingencia["Alto"] / percentual_categoria
+
+    # Ordenar categorias pelo Índice "Baixo"
+    contingencia = contingencia.sort_values(by="Indice_Baixo", ascending=False)
+
+    # Criar gráfico com os dois índices
+    plt.figure(figsize=(14, 6))
+    plt.plot(contingencia.index, contingencia["Indice_Baixo"], marker="o", linestyle="-", color="blue", label="Índice Baixo")
+    plt.plot(contingencia.index, contingencia["Indice_Alto"], marker="o", linestyle="-", color="red", label="Índice Alto")
+
+    plt.ylabel("Índice (Sem Normalização)")
+    plt.xticks(rotation=90)
+    plt.title(f"Índice do Cluster 'Baixo' e 'Alto' por {var} (Excluindo Categorias na Cauda Esquerda)")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+    
+    for var in colunas_chi2:
+        # Criar tabela de contingência
+        contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
+    
+        # Normalizar valores (percentual dos clusters por categoria)
+        contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
+    
+        # Criar DataFrame com percentual das categorias no total (para calcular os índices)
+        total_categoria = df[var].value_counts()
+        percentual_categoria = total_categoria / total_categoria.sum() * 100
+    
+        # Calcular a média e o desvio padrão global de cada cluster
+        media_cluster = contingencia.mean()
+        desvio_cluster = contingencia.std()
+    
+        # Calcular o Índice Z-Score para "Baixo" e "Alto"
+        contingencia["Indice_Baixo_Z"] = (contingencia["Baixo"] - media_cluster["Baixo"]) / desvio_cluster["Baixo"]
+        contingencia["Indice_Alto_Z"] = (contingencia["Alto"] - media_cluster["Alto"]) / desvio_cluster["Alto"]
+    
+        # Ordenar categorias pelo Índice "Baixo"
+        contingencia = contingencia.sort_values(by="Indice_Baixo_Z", ascending=False)
+    
+        # Criar gráfico com os dois índices Z-Score
+        plt.figure(figsize=(14, 6))
+        plt.plot(contingencia.index, contingencia["Indice_Baixo_Z"], marker="o", linestyle="-", color="blue", label="Índice Z - Baixo")
+        plt.plot(contingencia.index, contingencia["Indice_Alto_Z"], marker="o", linestyle="-", color="red", label="Índice Z - Alto")
+    
+        plt.ylabel("Índice Z-Score")
+        plt.xticks(rotation=90)
+        plt.title(f"Índice Z-Score do Cluster 'Baixo' e 'Alto' por {var}")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+    
+for var in colunas_chi2:
+    # Criar tabela de contingência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
+
+    # Normalizar valores (percentual dos clusters por categoria)
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
+
+    # Criar DataFrame com percentual das categorias no total (para calcular os índices)
+    total_categoria = df[var].value_counts()
+    percentual_categoria = total_categoria / total_categoria.sum() * 100
+
+    # Calcular a média e o desvio padrão global de cada cluster
+    media_cluster = contingencia.mean()
+    desvio_cluster = contingencia.std()
+
+    # Calcular o Índice Z-Score para "Baixo" e "Alto"
+    contingencia["Indice_Baixo_Z"] = (contingencia["Baixo"] - media_cluster["Baixo"]) / desvio_cluster["Baixo"]
+    contingencia["Indice_Alto_Z"] = (contingencia["Alto"] - media_cluster["Alto"]) / desvio_cluster["Alto"]
+
+    # Calcular a diferença direta entre os Z-Scores (sem valor absoluto)
+    contingencia["Indice_Comparativo_Z"] = contingencia["Indice_Baixo_Z"] - contingencia["Indice_Alto_Z"]
+
+    # Ordenar categorias pelo Índice Comparativo Z (valores positivos primeiro)
+    contingencia = contingencia.sort_values(by="Indice_Comparativo_Z", ascending=False)
+
+    # Criar gráfico mostrando a diferença de Z-Score entre os clusters
+    plt.figure(figsize=(14, 6))
+    plt.plot(contingencia.index, contingencia["Indice_Comparativo_Z"], marker="o", linestyle="-", color="blue", label="Índice Comparativo Z")
+
+    plt.axhline(0, color="black", linestyle="--")  # Linha central para diferenciar positivo e negativo
+    plt.ylabel("Comparação Z-Score (Baixo - Alto)")
+    plt.xticks(rotation=90)
+    plt.title(f"Índice Comparativo Z entre Cluster 'Baixo' e 'Alto' por {var}")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
