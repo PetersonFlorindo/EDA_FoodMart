@@ -589,13 +589,11 @@ A variável cost, o custo de aquisição de cliente, não apresenta correlação
 Para a análise da relação do custo de aquisição de clientes, foi utilizado o teste de Kruskal-Wallis em vez da ANOVA por não exigir que os dados sigam uma distribuição normal ou que as variâncias entre os grupos sejam homogêneas. Com essa análise, será possível identificar se há diferenças estatisticamente significativas no custo de aquisição em função das variáveis categóricas.
 
 ```Python
-#analise quanti x quali
-    
 import pandas as pd
 from scipy.stats import kruskal
 
 #Criando um dicionário para armazenar os resultados
-kruskal_results = {}
+kruskal_resultados = {}
 
 #aplicando o teste de Kruskal-Wallis para cada variável qualitativa em relação ao custo
 for var in colunas_quali:
@@ -603,20 +601,30 @@ for var in colunas_quali:
     grupos = [df[df[var] == categoria]["cost"] for categoria in df[var].unique()]
     print(grupos)
     H, p_valor = kruskal(*grupos)
-    kruskal_results[var] = {"H": H, "p_valor": p_valor}
+    kruskal_resultados[var] = {"H": H, "p_valor": p_valor}
 
 #Criando um DataFrame para visualizar os resultados
-kruskal_df = pd.DataFrame.from_dict(kruskal_results, orient='index')
-kruskal_significativo = kruskal_df[kruskal_df['p_valor']<=0.05]
+kruskal_df = pd.DataFrame.from_dict(kruskal_resultados, orient='index')
 
-#salvando variáveis significativas
-colunas_kruskal = kruskal_significativo.index
+#salvando variaveis significativas
+kruskal_significativo = kruskal_df[kruskal_df['p_valor']<=0.05]
 ```
 <p align='center'>
 <img src="Imagens/df_kurkal.png" width="25%">
 </p>
 
 Os gráficos a seguir mostram a distribuição do custo de aquisição de clientes para as variáveis categóricas que mostraram diferenças significativas no teste de Kruskal-Wallis. A visualização em boxplot destaca a dispersão e a mediana dos grupos. (Clique na imagem para ampliá-la).
+
+```Python
+for variavel in colunas_kruskal:
+    plt.figure(figsize=(10, 5))
+    sns.boxplot(x=df[variavel], y=df['cost'], palette='coolwarm')
+    plt.title(f'Distribuição do Custo por {variavel} (Violino)')
+    plt.ylabel('Custo')
+    plt.xlabel(variavel)
+    plt.xticks(rotation=90)
+    plt.show()
+```
 
 <p align='center'>
     <img src="Imagens/grafico_kruskal (1).png" width="30%">
@@ -638,3 +646,48 @@ Os gráficos a seguir mostram a distribuição do custo de aquisição de client
 ## Resultados e discussão
 
 Os gráficos mostram como o custo de aquisição varia entre diferentes variáveis categóricas, revelando diferenças significativas entre os grupos. No entanto, a alta dispersão dos valores dentro de algumas variáveis qualitativas pode dificultar a identificação de padrões mais claros. Para entender melhor essas variações, a próxima etapa da análise será focada na segmentação dos custos em clusters, permitindo agrupar faixas de valores semelhantes e identificar como diferentes variáveis qualitativas, como tipo de mídia e promoção aplicada, estão associadas a cada nível de custo.
+
+# Análise multivariada: Clusterização do custo de aquisição de cliente
+
+Para segmentar os custos, foi utilizado o modelo Gaussian Mixture Model (GMM), que agrupa valores semelhantes sem assumir uma distribuição fixa. 
+
+```Python
+from sklearn.mixture import GaussianMixture
+import numpy as np
+
+#Ajustando um modelo GMM na distribuição de 'cost'
+cost_values = df["cost"].values.reshape(-1, 1)
+gmm = GaussianMixture(n_components=3, random_state=42).fit(cost_values)
+
+#Gerando pontos para plotar a distribuição ajustada
+x = np.linspace(df["cost"].min(), df["cost"].max(), 1000)
+densidade = np.exp(gmm.score_samples(x.reshape(-1, 1)))
+```
+
+O gráfico a seguir compara a distribuição real do custo com o ajuste feito pelo GMM, permitindo visualizar como os clusters foram formados. Isso facilita a análise da relação entre os níveis de custo e as variáveis qualitativas.
+
+```Python
+#Plotando a distribuição real e a ajustada pelo GMM
+plt.figure(figsize=(10,6))
+sns.histplot(df["cost"], bins=30, color="gray", kde=False, stat="density", alpha=0.6)
+plt.plot(x, densidade, color="red", label="GMM Ajustado")
+plt.title("Ajuste de Mistura Gaussiana - Custo")
+plt.legend()
+plt.show()
+
+df["cluster_custo"] = gmm.predict(df["cost"].values.reshape(-1, 1))
+
+#Distribuição de custo por cluster identificado
+sns.boxplot(x="cost_cluster", y="cost", data=df)
+plt.title("Boxplot do Custo por Cluster GMM")
+plt.show()
+```
+<p align='center'>
+    <img src="Imagens/cluster_gmm.png" width="40%">
+    <img src="Imagens/boxplot_gmm.png" width="40%">
+</p>
+
+Os cluster foram categorizados como sendo de custo de aquisição de cliente 'Baixo' (para o cluste 1), 'Alto' (para o cluster 0) e 'Médio' (para o cluster 2):
+```Python
+df["cluster_custo"] = df["cluster_custo"].replace({0: 'Alto', 1: 'Baixo', 2: 'Médio'})
+```
