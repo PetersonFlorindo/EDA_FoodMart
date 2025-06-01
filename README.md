@@ -695,3 +695,98 @@ df["cluster_custo"] = df["cluster_custo"].replace({0: 'Custo Alto', 1: 'Custo Ba
 ## Resultados e discussão
 
 A aplicação do GMM ao custo de aquisição permitiu identificar três clusters com padrões distintos de distribuição. O agrupamento revelou assimetrias não captadas pelas análises descritivas, destacando um grupo concentrado com baixos custos e outro com dispersão elevada. Essa segmentação oferece uma base robusta para explorar como variáveis qualitativas influenciam os diferentes perfis de custo
+
+# Análise do impacto de variáveis qualitativas no custo de aquisição de clientes
+
+Para verificar a associação entre variáveis qualitativas e os clusters de custo, foi aplicado o teste qui-quadrado em tabelas de contingência que cruzam cada variável com os grupos “Custo Baixo”, “Custo Médio” e “Custo Alto”. As variáveis com p-valor ≤ 0,05 foram consideradas significativamente relacionadas ao custo de aquisição.
+
+```Python
+import scipy.stats as stats
+
+#Analisando comportamento das variáveis com impacto no CAC por faixa de custo
+
+#Criando um dicionário para armazenar os resultados
+resultados_chi2 = {}
+
+# Verificando se variáveis possuem associação com classe de custo
+for var in colunas_kruskal:
+    #criando tabela d contigência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var])
+    # Aplicar teste qui-quadrado
+    chi2, p_valor, dof, esperado = stats.chi2_contingency(contingencia)
+    resultados_chi2[var] = {"chi2": chi2, "p_valor": p_valor}
+
+#Criando um DataFrame para visualizar os resultados
+chi2_df = pd.DataFrame.from_dict(resultados_chi2, orient='index')
+chi2_significativo = chi2_df[chi2_df['p_valor']<=0.05]
+
+#salvando variáveis significativas
+colunas_chi2 = chi2_significativo.index
+```
+Para as variáveis com impacto significativo no custo de aquisição de clientes geraram-se gráficos de linha mostrando, em porcentagem, como cada categoria distribui clientes faixas de custo alto, médio e baixo. O objetivo será identificar categorias associadas a altas porcentagens de clientes de alto ou baixo custo.
+
+```Python
+#faixas de custo
+custos = ["Custo Baixo", "Custo Médio", "Custo Alto"]
+dic_cor = {"Custo Baixo": "green", "Custo Médio": "orange", "Custo Alto": "red"}
+
+#Criando visualização das associações
+
+for var in colunas_chi2:
+    #criando tabela de contigência
+    contingencia = pd.crosstab(df["cluster_custo"], df[var]).T
+    #normalizando valores
+    contingencia = contingencia.div(contingencia.sum(axis=1), axis=0) * 100
+    for custo in custos:
+        contingencia = contingencia.sort_values(by=custo, ascending = False)
+         #Gráfico 1: Linha mostrando variação da porcentagem do cluster "Baixo" por promotion_name
+        plt.figure(figsize=(14, 6))
+        plt.plot(contingencia.index, contingencia[custo], marker="o", linestyle="-", color=dic_cor[custo], label=f"Cluster {custo}")
+        plt.title(f"Percentual da faixa de {custo} do total de clientes por {var}")
+        plt.ylabel("Percentual (%)")
+        plt.xticks(rotation=90)
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+```
+<p align='center'>
+    <img src="Imagens/percentual_cac_categoria (1).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (2).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (3).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (4).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (5).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (6).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (7).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (8).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (9).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (10).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (11).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (12).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (13).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (14).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (15).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (16).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (17).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (18).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (19).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (20).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (21).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (22).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (23).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (24).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (25).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (26).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (27).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (28).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (29).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (30).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (31).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (32).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (33).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (34).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (35).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (36).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (37).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (38).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (39).png" width="10%">
+</p>
