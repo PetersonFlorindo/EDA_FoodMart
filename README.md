@@ -689,5 +689,9 @@ plt.show()
 
 Os cluster foram categorizados como sendo de custo de aquisição de cliente 'Baixo' (para o cluste 1), 'Alto' (para o cluster 0) e 'Médio' (para o cluster 2):
 ```Python
-df["cluster_custo"] = df["cluster_custo"].replace({0: 'Alto', 1: 'Baixo', 2: 'Médio'})
+df["cluster_custo"] = df["cluster_custo"].replace({0: 'Custo Alto', 1: 'Custo Baixo', 2: 'Custo Médio'})
 ```
+
+## Resultados e discussão
+
+A aplicação do GMM ao custo de aquisição permitiu identificar três clusters com padrões distintos de distribuição. O agrupamento revelou assimetrias não captadas pelas análises descritivas, destacando um grupo concentrado com baixos custos e outro com dispersão elevada. Essa segmentação oferece uma base robusta para explorar como variáveis qualitativas influenciam os diferentes perfis de custo
