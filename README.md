@@ -799,9 +799,11 @@ Dentre os principais achados, temos que clientes de renda mais baixa concentram-
 # Índice de Eficiência de Custo por Categoria
 
 Para identificar categorias com participação acima ou abaixo da média nos clusters “Custo Baixo” e “Custo Alto”, foi calculado um Z-Score que compara o percentual de cada categoria em um cluster com a média e desvio padrão desse mesmo cluster. 
+
 <p align='center'>
     <img src="Imagens/z_score.png" width="50%">
 </p>
+
 Primeiro, foi construída uma tabela de contingência normalizada para cada variável qualitativa significativa (p ≤ 0,05) e, em seguida, para cada categoria, o percentual foi subtraído da média do cluster e dividido pelo desvio padrão. O gráfico resultante mostra, em verde, a categoria mais eficiente no cluster “Custo Baixo” e, em vermelho, a mais concentrada em “Custo Alto”.
 
 ```Python
