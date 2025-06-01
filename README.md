@@ -796,3 +796,41 @@ for var in colunas_chi2:
 Esta seção de análise revelou que determinadas promoções, formatos de loja e perfis de cliente concentram mais clientes em faixas específicas de custo, o que permitirá direcionar ações de marketing e ajustar campanhas para reduzir ou otimizar o investimento em aquisição de clientes.
 Dentre os principais achados, temos que clientes de renda mais baixa concentram-se no “Custo Baixo”, enquanto perfis de renda e escolaridade mais elevados (graduados e pós-graduados) aparecem nos clusters “Custo Médio” e “Custo Alto”, refletindo maior investimento para converter esses públicos. Promoções em mídia digital e e-mail marketing atraem clientes com custo de aquisição menor, ao passo que campanhas multicanal elevam esse custo, e formatos como “dois por um” e “desconto fixo” atendem principalmente ao grupo de custo intermediário. No programa de fidelidade, titulares de cartão Bronze predominam no “Custo Baixo”, Silver no “Custo Médio” e Gold no “Custo Alto”, sugerindo que clientes mais engajados exigem benefícios adicionais, aumentando o investimento para sua aquisição.
 
+# Índice de Eficiência de Custo por Categoria
+
+Para identificar categorias com participação acima ou abaixo da média nos clusters “Custo Baixo” e “Custo Alto”, foi calculado um Z-Score que compara o percentual de cada categoria em um cluster com a média e desvio padrão desse mesmo cluster. 
+<p align='center'>
+    <img src="Imagens/z_score.png" width="50%">
+</p>
+Primeiro, foi construída uma tabela de contingência normalizada para cada variável qualitativa significativa (p ≤ 0,05) e, em seguida, para cada categoria, o percentual foi subtraído da média do cluster e dividido pelo desvio padrão. O gráfico resultante mostra, em verde, a categoria mais eficiente no cluster “Custo Baixo” e, em vermelho, a mais concentrada em “Custo Alto”.
+
+```Python
+import scipy.stats as stats
+import matplotlib.pyplot as plt
+
+# Para cada variável significativa, criar Z-Score por categoria e plotar
+for var in colunas_chi2:
+    # Tabela de contingência normalizada (percentual)
+    cont = pd.crosstab(df["cluster_custo"], df[var]).T
+    cont = cont.div(cont.sum(axis=1), axis=0) * 100
+
+    # Média e desvio por cluster
+    mean = cont.mean()
+    std = cont.std()
+
+    # Cálculo do Z-Score para “Custo Baixo” e “Custo Alto”
+    cont["Z_Baixo"] = (cont["Custo Baixo"] - mean["Custo Baixo"]) / std["Custo Baixo"]
+    cont["Z_Alto"] = (cont["Custo Alto"] - mean["Custo Alto"]) / std["Custo Alto"]
+    cont = cont.sort_values(by="Z_Baixo", ascending=False)
+
+    # Plot do Z-Score
+    plt.figure(figsize=(12, 5))
+    plt.plot(cont.index, cont["Z_Baixo"], marker="o", color="green", label="Z – Custo Baixo")
+    plt.plot(cont.index, cont["Z_Alto"], marker="o", color="red", label="Z – Custo Alto")
+    plt.xticks(rotation=90)
+    plt.ylabel("Z-Score")
+    plt.title(f"Z-Score por Categoria de {var}")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+```
