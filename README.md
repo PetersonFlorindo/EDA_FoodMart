@@ -750,7 +750,7 @@ for var in colunas_chi2:
         plt.show()
 ```
 <p align='center'>
-    <img src="Imagens/percentual_cac_categoria (1).png" width="10%">
+    <img src="Imagens/percentual_cac_categoria (1).png" width="15%">
     <img src="Imagens/percentual_cac_categoria (2).png" width="10%">
     <img src="Imagens/percentual_cac_categoria (3).png" width="10%">
     <img src="Imagens/percentual_cac_categoria (4).png" width="10%">
