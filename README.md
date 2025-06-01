@@ -791,6 +791,8 @@ for var in colunas_chi2:
     <img src="Imagens/percentual_cac_categoria (39).png" width="10%">
 </p>
 
+## Resultados e discussão
+
 Esta seção de análise revelou que determinadas promoções, formatos de loja e perfis de cliente concentram mais clientes em faixas específicas de custo, o que permitirá direcionar ações de marketing e ajustar campanhas para reduzir ou otimizar o investimento em aquisição de clientes.
 Dentre os principais achados, temos que clientes de renda mais baixa concentram-se no “Custo Baixo”, enquanto perfis de renda e escolaridade mais elevados (graduados e pós-graduados) aparecem nos clusters “Custo Médio” e “Custo Alto”, refletindo maior investimento para converter esses públicos. Promoções em mídia digital e e-mail marketing atraem clientes com custo de aquisição menor, ao passo que campanhas multicanal elevam esse custo, e formatos como “dois por um” e “desconto fixo” atendem principalmente ao grupo de custo intermediário. No programa de fidelidade, titulares de cartão Bronze predominam no “Custo Baixo”, Silver no “Custo Médio” e Gold no “Custo Alto”, sugerindo que clientes mais engajados exigem benefícios adicionais, aumentando o investimento para sua aquisição.
 
